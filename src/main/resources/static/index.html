@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Student Management</title>
+<style>
+  body { font-family: Arial, sans-serif; max-width: 700px; margin: 40px auto; padding: 0 16px; color: #222; }
+  h1 { font-size: 22px; }
+  form { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
+  input { padding: 8px; flex: 1; min-width: 140px; }
+  button { padding: 8px 16px; background: #2563eb; color: #fff; border: none; border-radius: 4px; cursor: pointer; }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { text-align: left; padding: 8px; border-bottom: 1px solid #ddd; }
+  th { background: #f3f4f6; }
+</style>
+</head>
+<body>
+  <h1>Student Management</h1>
+
+  <form id="addForm">
+    <input id="name" placeholder="Name" required>
+    <input id="course" placeholder="Course" required>
+    <button type="submit">Add Student</button>
+  </form>
+
+  <table>
+    <thead>
+      <tr><th>ID</th><th>Name</th><th>Course</th></tr>
+    </thead>
+    <tbody id="rows"></tbody>
+  </table>
+
+<script>
+async function loadStudents() {
+  const res = await fetch('/api/students');
+  const students = await res.json();
+  const rows = document.getElementById('rows');
+  rows.innerHTML = '';
+  students.forEach(s => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${s.id}</td><td>${s.name}</td><td>${s.course}</td>`;
+    rows.appendChild(tr);
+  });
+}
+
+document.getElementById('addForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const name = document.getElementById('name').value;
+  const course = document.getElementById('course').value;
+  await fetch('/api/students', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, course })
+  });
+  document.getElementById('addForm').reset();
+  loadStudents();
+});
+
+loadStudents();
+</script>
+</body>
+</html>
